@@ -2,11 +2,26 @@ import ROOT
 import os
 import sys
 import numpy as np
+import math
 
 # Usage
 # ---------------------------
+
+def delta_phi(v1, v2, c=math.pi):
+    r = math.fmod(v2 - v1, 2.0 * c)
+
+    # In Python, fmod preserves sign, similar to C++
+    if r < -c:
+        r += 2.0 * c
+    elif r > c:
+        r -= 2.0 * c
+
+    return r
+    
+
+
 if len(sys.argv) < 2:
-    print("Usage: python analysis.py input1.root [input2.root ...] [--out output.root]")
+    print("Usage: python analysis.py input1.root [input2.root ...] [--out output.root] [--ZJetsDecay Ztautau]")
     sys.exit(1)
 
 # Parse arguments
@@ -19,7 +34,25 @@ else:
     output_file = "histograms.root"
     input_files = args
 
+outZTau = False
+if("--ZJetsDecay" in args):
+    if(args[args.index("--ZJetsDecay") + 1] == "Ztautau"):
+        outZTau = True
+
 tree_name = "Events"
+
+isMC = True
+if "2012" in input_files[0]:
+    isMC = False
+    
+isZJets = False
+if "DYJets" in input_files[0]:
+    isZJets = True
+
+
+
+
+
 
 # histogram definitions
 #muons
@@ -29,18 +62,8 @@ histo_muon_phi = ROOT.TH1F("histo_muon_phi", "Muon phi; phi; Events", 64, -3.2, 
 histo_muon_charge = ROOT.TH1F("histo_muon_charge", "Muon charge; charge; Events", 5, -2, 2)
 histo_muon_GENpdgId = ROOT.TH1F("histo_muon_GENpdgId", "Muon GEN pdgId; pdgId; Events", 51, -25.5, 25.5)
 
-#taus
-histo_tau_pt = ROOT.TH1F("histo_tau_pt", "Tau pT; pT [GeV]; Events", 100, 0, 200)
-histo_tau_eta = ROOT.TH1F("histo_tau_eta", "Tau eta; eta; Events", 100, -2.5, 2.5)
-histo_tau_phi = ROOT.TH1F("histo_tau_phi", "Tau phi; phi; Events", 64, -3.2, 3.2)
-histo_tau_charge = ROOT.TH1F("histo_tau_charge", "Tau charge; charge; Events", 5, -2, 2)
-histo_tau_GENpdgId = ROOT.TH1F("histo_tau_GENpdgId", "Tau GEN pdgId; pdgId; Events", 51, -25, 25)
 
-#Higgs candidate
-histo_higgs_pt = ROOT.TH1F("histo_higgs_pt", "Higgs candidate pT; pT [GeV]; Events", 100, 0, 300)
-histo_higgs_eta = ROOT.TH1F("histo_higgs_eta", "Higgs candidate eta; eta; Events", 100, -5, 5)
-histo_higgs_phi = ROOT.TH1F("histo_higgs_phi", "Higgs candidate phi; phi; Events", 64, -3.2, 3.2)
-histo_higgs_mass = ROOT.TH1F("histo_higgs_mass", "Higgs candidate mass; mass [GeV]; Events", 20, 20, 140)  
+
 
 
 # ---------------------------
@@ -58,9 +81,27 @@ for f in input_files:
 n_events = chain.GetEntries()
 print(f"Total entries: {n_events}")
 
+w=1.0
+
 for i, event in enumerate(chain):
     if i % 10000 == 0:
         print(f"Processing event {i}/{n_events}")
+
+    if i==0:
+        w = event.weight
+
+    # Trigger selection
+    if(event.HLT_IsoMu17_eta2p1_LooseIsoPFTau20 == 0):
+        continue
+
+    #veto b jets
+    #if(event.jbtag_1.size() > 0):
+    #if(event.jbtag_1 ==1):
+    #    continue
+
+    #if(event.jbtag_2.size() > 0):
+    #if(event.jbtag_2 ==1):
+    #    continue
 
     # Muon loop
     for j in range(event.nMuon):
@@ -68,29 +109,18 @@ for i, event in enumerate(chain):
         muon_eta = event.Muon_eta[j]
         muon_phi = event.Muon_phi[j]
         muon_charge = event.Muon_charge[j]
-        muon_genPartIdx = event.Muon_genPartIdx[j]
-        muon_genPdgId = event.GenPart_pdgId[muon_genPartIdx]
+        muon_tight = event.Muon_tightId[j]
+        if(isMC):
+            muon_genPartIdx = event.Muon_genPartIdx[j]
+            muon_genPdgId = event.GenPart_pdgId[muon_genPartIdx]
+        # Fill muon histograms
+        histo_muon_pt.Fill(muon_pt, w)
+        histo_muon_eta.Fill(muon_eta, w)
+        histo_muon_phi.Fill(muon_phi, w)
+        histo_muon_charge.Fill(muon_charge, w)
+        if(isMC):
+            histo_muon_GENpdgId.Fill(muon_genPdgId, w)
 
-        histo_muon_pt.Fill(muon_pt)
-        histo_muon_eta.Fill(muon_eta)
-        histo_muon_phi.Fill(muon_phi)
-        histo_muon_charge.Fill(muon_charge)
-        histo_muon_GENpdgId.Fill(muon_genPdgId)
-
-    # Tau loop
-    for j in range(event.nTau):
-        tau_pt = event.Tau_pt[j]
-        tau_eta = event.Tau_eta[j]
-        tau_phi = event.Tau_phi[j]
-        tau_charge = event.Tau_charge[j]
-        tau_genPartIdx = event.Tau_genPartIdx[j]
-        tau_genPdgId = event.GenPart_pdgId[tau_genPartIdx]
-
-        histo_tau_pt.Fill(tau_pt)
-        histo_tau_eta.Fill(tau_eta)
-        histo_tau_phi.Fill(tau_phi)
-        histo_tau_charge.Fill(tau_charge)
-        histo_tau_GENpdgId.Fill(tau_genPdgId)   
 
     # Build Higgs candidate
     if event.nMuon > 0 and event.nTau > 0:
@@ -99,13 +129,14 @@ for i, event in enumerate(chain):
         #loop over muons and taus
         for j in range(event.nMuon):
             # Add ID conditions for muons
+            
             muon = ROOT.TLorentzVector()
             muon.SetPtEtaPhiM(event.Muon_pt[j], event.Muon_eta[j], event.Muon_phi[j], event.Muon_mass[j])
             for k in range(event.nTau):
                 # Add ID conditions for taus
                 tau = ROOT.TLorentzVector()
                 tau.SetPtEtaPhiM(event.Tau_pt[k], event.Tau_eta[k], event.Tau_phi[k], event.Tau_mass[k])
-                if(muon.DeltaR(tau) > 0.5 and event.Tau_charge[k]*event.Muon_charge[j] < 0):  
+                if(muon.DeltaR(tau) > 0.5):  
                     validpair_matrix[j][k] = 1
         
         #find the best muon-tau pair 
@@ -113,9 +144,7 @@ for i, event in enumerate(chain):
         max_pt=-1
         best_muon_index = -1
         for i in range(event.nMuon):
-            for j in range(event.nTau):
-                if validpair_matrix[i, j] == 0:
-                    continue
+            if validpair_matrix[i].any(): #check if there is at least one valid tau for muon i
                 muon = ROOT.TLorentzVector()
                 muon.SetPtEtaPhiM(event.Muon_pt[i], event.Muon_eta[i], event.Muon_phi[i], event.Muon_mass[i])
                 if(muon.Pt() > max_pt):
@@ -123,29 +152,34 @@ for i, event in enumerate(chain):
                     best_muon_index = i
         #  2) most isolated tau
         min_iso=9999
-        best_tau_index = -1
-        for j in range(event.nTau):
-                if validpair_matrix[best_muon_index, j] == 0:
-                    continue
-                tau_relIso = event.Tau_relIso_all[j]
-                if(tau_relIso < min_iso):
-                    min_iso = tau_relIso
-                    best_tau_index = j
-
-
+        best_tau_index = 1
 
         #Higgs candidate four-vector
         if(best_muon_index != -1 and best_tau_index != -1):
             muon = ROOT.TLorentzVector()
             muon.SetPtEtaPhiM(event.Muon_pt[best_muon_index], event.Muon_eta[best_muon_index], event.Muon_phi[best_muon_index], event.Muon_mass[best_muon_index])
-            tau = ROOT.TLorentzVector()
-            tau.SetPtEtaPhiM(event.Tau_pt[best_tau_index], event.Tau_eta[best_tau_index], event.Tau_phi[best_tau_index], event.Tau_mass[best_tau_index])
-            higgs_candidate = muon + tau
+            #analogous for tau
+            
+            #higgs_candidate = muon + tau 
+
             # Fill histograms
-            histo_higgs_pt.Fill(higgs_candidate.Pt())
-            histo_higgs_eta.Fill(higgs_candidate.Eta())
-            histo_higgs_phi.Fill(higgs_candidate.Phi())
-            histo_higgs_mass.Fill(higgs_candidate.M())
+            #if(math.fabs(event.GenPart_pdgId[event.Tau_genPartIdx[best_tau_index]]) != 15 or math.fabs(event.GenPart_pdgId[event.Muon_genPartIdx[best_muon_index]]) != 15):
+                #if(event.Tau_charge[best_tau_index]*event.Muon_charge[best_muon_index] < 0):
+                    #histo_higgs_pt.Fill(higgs_candidate.Pt(), w)
+                    #histo_higgs_eta.Fill(higgs_candidate.Eta(), w)
+                    #histo_higgs_phi.Fill(higgs_candidate.Phi(), w)
+                    #histo_higgs_mass.Fill(higgs_candidate.M(), w)
+
+                    #histo_BestMuon_pt.Fill(event.Muon_pt[best_muon_index], w)
+                    #histo_BestMuon_eta.Fill(event.Muon_eta[best_muon_index], w)
+                    #histo_BestMuon_phi.Fill(event.Muon_phi[best_muon_index], w)
+                    #histo_BestMuon_charge.Fill(event.Muon_charge[best_muon_index], w)
+                    #if(isMC):
+                    #    histo_BestMuon_GENpdgId.Fill(event.GenPart_pdgId[event.Muon_genPartIdx[best_muon_index]], w)
+
+                    #fill analogous histograms for tau
+            
+            
 
 # ---------------------------
 # Save histograms
@@ -157,15 +191,7 @@ histo_muon_eta.Write()
 histo_muon_phi.Write()                          
 histo_muon_charge.Write()
 histo_muon_GENpdgId.Write()
-histo_tau_pt.Write()
-histo_tau_eta.Write()
-histo_tau_phi.Write()
-histo_tau_charge.Write()
-histo_tau_GENpdgId.Write()
-histo_higgs_pt.Write()
-histo_higgs_eta.Write()
-histo_higgs_phi.Write()
-histo_higgs_mass.Write()
+
 output.Close()
 print(f"Histograms saved to {output_file}")
 
