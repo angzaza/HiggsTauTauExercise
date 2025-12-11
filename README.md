@@ -8,5 +8,9 @@ Usage:
 ```python3 analysis.py input1.root [input2.root ...] [--out output.root]```
 
 ## Plotting
+```python3 Plotter1.py```
+
+```python3 Plotter2.py```
+
 
 
