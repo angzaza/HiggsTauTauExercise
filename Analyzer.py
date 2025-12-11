@@ -87,21 +87,10 @@ for i, event in enumerate(chain):
     if i % 10000 == 0:
         print(f"Processing event {i}/{n_events}")
 
-    if i==0:
-        w = event.weight
 
     # Trigger selection
     if(event.HLT_IsoMu17_eta2p1_LooseIsoPFTau20 == 0):
         continue
-
-    #veto b jets
-    #if(event.jbtag_1.size() > 0):
-    #if(event.jbtag_1 ==1):
-    #    continue
-
-    #if(event.jbtag_2.size() > 0):
-    #if(event.jbtag_2 ==1):
-    #    continue
 
     # Muon loop
     for j in range(event.nMuon):
@@ -114,12 +103,12 @@ for i, event in enumerate(chain):
             muon_genPartIdx = event.Muon_genPartIdx[j]
             muon_genPdgId = event.GenPart_pdgId[muon_genPartIdx]
         # Fill muon histograms
-        histo_muon_pt.Fill(muon_pt, w)
-        histo_muon_eta.Fill(muon_eta, w)
-        histo_muon_phi.Fill(muon_phi, w)
-        histo_muon_charge.Fill(muon_charge, w)
+        histo_muon_pt.Fill(muon_pt)
+        histo_muon_eta.Fill(muon_eta)
+        histo_muon_phi.Fill(muon_phi)
+        histo_muon_charge.Fill(muon_charge)
         if(isMC):
-            histo_muon_GENpdgId.Fill(muon_genPdgId, w)
+            histo_muon_GENpdgId.Fill(muon_genPdgId)
 
 
     # Build Higgs candidate
@@ -165,17 +154,17 @@ for i, event in enumerate(chain):
             # Fill histograms
             #if(math.fabs(event.GenPart_pdgId[event.Tau_genPartIdx[best_tau_index]]) != 15 or math.fabs(event.GenPart_pdgId[event.Muon_genPartIdx[best_muon_index]]) != 15):
                 #if(event.Tau_charge[best_tau_index]*event.Muon_charge[best_muon_index] < 0):
-                    #histo_higgs_pt.Fill(higgs_candidate.Pt(), w)
-                    #histo_higgs_eta.Fill(higgs_candidate.Eta(), w)
-                    #histo_higgs_phi.Fill(higgs_candidate.Phi(), w)
-                    #histo_higgs_mass.Fill(higgs_candidate.M(), w)
+                    #histo_higgs_pt.Fill(higgs_candidate.Pt())
+                    #histo_higgs_eta.Fill(higgs_candidate.Eta())
+                    #histo_higgs_phi.Fill(higgs_candidate.Phi())
+                    #histo_higgs_mass.Fill(higgs_candidate.M())
 
-                    #histo_BestMuon_pt.Fill(event.Muon_pt[best_muon_index], w)
-                    #histo_BestMuon_eta.Fill(event.Muon_eta[best_muon_index], w)
-                    #histo_BestMuon_phi.Fill(event.Muon_phi[best_muon_index], w)
-                    #histo_BestMuon_charge.Fill(event.Muon_charge[best_muon_index], w)
+                    #histo_BestMuon_pt.Fill(event.Muon_pt[best_muon_index])
+                    #histo_BestMuon_eta.Fill(event.Muon_eta[best_muon_index])
+                    #histo_BestMuon_phi.Fill(event.Muon_phi[best_muon_index])
+                    #histo_BestMuon_charge.Fill(event.Muon_charge[best_muon_index])
                     #if(isMC):
-                    #    histo_BestMuon_GENpdgId.Fill(event.GenPart_pdgId[event.Muon_genPartIdx[best_muon_index]], w)
+                    #    histo_BestMuon_GENpdgId.Fill(event.GenPart_pdgId[event.Muon_genPartIdx[best_muon_index]])
 
                     #fill analogous histograms for tau
             
