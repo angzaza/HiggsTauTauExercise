@@ -141,7 +141,7 @@ for i, event in enumerate(chain):
                     best_muon_index = i
         #  2) most isolated tau
         min_iso=9999
-        best_tau_index = 1
+        best_tau_index = -1
 
         #Higgs candidate four-vector
         if(best_muon_index != -1 and best_tau_index != -1):
