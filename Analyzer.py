@@ -152,21 +152,21 @@ for i, event in enumerate(chain):
             #higgs_candidate = muon + tau 
 
             # Fill histograms
-            #if(math.fabs(event.GenPart_pdgId[event.Tau_genPartIdx[best_tau_index]]) != 15 or math.fabs(event.GenPart_pdgId[event.Muon_genPartIdx[best_muon_index]]) != 15):
-                #if(event.Tau_charge[best_tau_index]*event.Muon_charge[best_muon_index] < 0):
-                    #histo_higgs_pt.Fill(higgs_candidate.Pt())
-                    #histo_higgs_eta.Fill(higgs_candidate.Eta())
-                    #histo_higgs_phi.Fill(higgs_candidate.Phi())
-                    #histo_higgs_mass.Fill(higgs_candidate.M())
+            
+            #if(event.Tau_charge[best_tau_index]*event.Muon_charge[best_muon_index] < 0):
+                #histo_higgs_pt.Fill(higgs_candidate.Pt())
+                #histo_higgs_eta.Fill(higgs_candidate.Eta())
+                #histo_higgs_phi.Fill(higgs_candidate.Phi())
+                #histo_higgs_mass.Fill(higgs_candidate.M())
 
-                    #histo_BestMuon_pt.Fill(event.Muon_pt[best_muon_index])
-                    #histo_BestMuon_eta.Fill(event.Muon_eta[best_muon_index])
-                    #histo_BestMuon_phi.Fill(event.Muon_phi[best_muon_index])
-                    #histo_BestMuon_charge.Fill(event.Muon_charge[best_muon_index])
-                    #if(isMC):
-                    #    histo_BestMuon_GENpdgId.Fill(event.GenPart_pdgId[event.Muon_genPartIdx[best_muon_index]])
+                #histo_BestMuon_pt.Fill(event.Muon_pt[best_muon_index])
+                #histo_BestMuon_eta.Fill(event.Muon_eta[best_muon_index])
+                #histo_BestMuon_phi.Fill(event.Muon_phi[best_muon_index])
+                #histo_BestMuon_charge.Fill(event.Muon_charge[best_muon_index])
+                ##if(isMC):
+                #    histo_BestMuon_GENpdgId.Fill(event.GenPart_pdgId[event.Muon_genPartIdx[best_muon_index]])
 
-                    #fill analogous histograms for tau
+                #fill analogous histograms for tau
             
             
 
