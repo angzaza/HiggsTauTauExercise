@@ -1,6 +1,5 @@
 #!/bin/bash
 
-cmsenv
 echo "Starting analysis jobs..."
 echo "python3 Analyzer.py GluGluToHToTauTauSkim.root --out rootfiles_output/GluGluToHToTauTauAna.root"
 python3 Analyzer.py GluGluToHToTauTauSkim.root --out rootfiles_output/GluGluToHToTauTauAna.root
