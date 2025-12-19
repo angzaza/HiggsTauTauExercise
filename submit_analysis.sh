@@ -9,12 +9,12 @@ echo "python3 Analyzer.py VBF_HToTauTauSkim.root --out rootfiles_output/VBF_HToT
 python3 Analyzer.py VBF_HToTauTauSkim.root --out rootfiles_output/VBF_HToTauTauAna.root
 sleep 1
 
-echo "python3 Analyzer.py DYJetsToLLkim.root --out rootfiles_output/DYJetsToTauTauAna.root --ZJetsDecay Ztautau"
-python3 Analyzer.py DYJetsToLLSkim.root --out rootfiles_output/DYJetsToTauTauAna.root --ZJetsDecay Ztautau
-sleep 1
+#echo "python3 Analyzer.py DYJetsToLLkim.root --out rootfiles_output/DYJetsToTauTauAna.root 
+#python3 Analyzer.py DYJetsToLLSkim.root --out rootfiles_output/DYJetsToTauTauAna.root 
+#sleep 1
 
-echo "python3 Analyzer.py DYJetsToLLkim.root --out rootfiles_output/DYJetsToLLAna.root --ZJetsDecay Zll"
-python3 Analyzer.py DYJetsToLLSkim.root --out rootfiles_output/DYJetsToLLAna.root --ZJetsDecay Zll
+echo "python3 Analyzer.py DYJetsToLLkim.root --out rootfiles_output/DYJetsToLLAna.root 
+python3 Analyzer.py DYJetsToLLSkim.root --out rootfiles_output/DYJetsToLLAna.root 
 sleep 1
 
 echo "python3 Analyzer.py TTbarSkim.root --out rootfiles_output/TTbarAna.root"
